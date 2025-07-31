@@ -31,3 +31,9 @@
    ```bash
    django-admin --version
    ```
+
+5. Inicializar o servidor
+
+   ```bash
+   python manager.py runserver
+   ```
