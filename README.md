@@ -1,17 +1,33 @@
-## Como rodar o projeto:
 
-1 - Crie o ambiente virtual:
-    python -m venv venv
+# Como rodar o projeto
 
-2 - Ative o ambiente virtual:
-    linux: source venv/bin/activate
-    windows: ./venv/Scripts/activate
+1. Crie o ambiente virtual:
 
-3 - Instale o Django:
-    pip install django
+    ```bash
+   python -m venv venv
+   ```
 
-4 - Valide a instalação do Django:
-    django-admin --version
+2. Ative o ambiente virtual:
+   - **Linux:**  
 
+     ```bash
+     source venv/bin/activate
+     ```
 
-    
+   - **Windows:**  
+
+     ```bash
+     .\venv\Scripts\activate
+     ```
+
+3. Instale o Django:
+
+   ```bash
+   pip install django
+   ```
+
+4. Valide a instalação do Django:
+
+   ```bash
+   django-admin --version
+   ```
