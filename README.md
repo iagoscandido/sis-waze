@@ -35,5 +35,5 @@
 5. Inicializar o servidor
 
    ```bash
-   python manager.py runserver
+   python manage.py runserver
    ```
