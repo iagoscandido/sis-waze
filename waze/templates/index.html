@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mapa de Alertas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+      }
+      #filtro-container {
+        padding: 10px;
+        background-color: white;
+        z-index: 1000;
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+      }
+      #map {
+        height: 100vh;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="filtro-container">
+      <label for="ruaSelect">Filtrar por rua:</label>
+      <select id="ruaSelect">
+        <option value="__all__">Todas</option>
+      </select>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+      const map = L.map("map").setView([-22.9, -43.2], 10);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(map);
+
+      // Salva os marcadores para controle de visibilidade
+      let allMarkers = [];
+      let example_json = "waze/templates/example.json";
+
+      fetch(example_json) // ou use caminho completo / estático se estiver rodando via servidor
+        .then((res) => res.json())
+        .then((data) => {
+          const ruas = new Set();
+          data.alerts.forEach((alert) => {
+            const { street, location, type, subtype, city, reportDescription } =
+              alert;
+
+            if (location && location.y && location.x) {
+              const popup = `
+              <strong>${type}</strong><br>
+              ${subtype || "Sem subtipo"}<br>
+              ${street || "Rua desconhecida"}<br>
+              ${city || ""}<br>
+              ${reportDescription || ""}
+            `;
+              const marker = L.marker([location.y, location.x]).bindPopup(
+                popup
+              );
+              marker.alertStreet = street || "__sem_nome__";
+              marker.addTo(map);
+              allMarkers.push(marker);
+
+              if (street) ruas.add(street);
+            }
+          });
+
+          // Preenche o <select> com ruas únicas
+          const select = document.getElementById("ruaSelect");
+          Array.from(ruas)
+            .sort()
+            .forEach((rua) => {
+              const option = document.createElement("option");
+              option.value = rua;
+              option.textContent = rua;
+              select.appendChild(option);
+            });
+
+          // Evento de filtro por rua
+          select.addEventListener("change", () => {
+            const selected = select.value;
+            allMarkers.forEach((marker) => {
+              const isVisible =
+                selected === "__all__" || marker.alertStreet === selected;
+              if (isVisible) {
+                marker.addTo(map);
+              } else {
+                map.removeLayer(marker);
+              }
+            });
+          });
+        });
+    </script>
+  </body>
+</html>
